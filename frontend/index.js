@@ -1,28 +1,31 @@
 const urlApi = 'http://localhost:3000/filmes'
 let editando = false;
 let idEdit = 0;
-let visto = false;
+
 
 
 const itemLista = document.querySelector('ul');
 console.log(itemLista);
 
 const getFilmes = async () => {
+  
   const response = await fetch(urlApi);
   const data = await response.json();
-  console.log(data);
-
+  //console.log(`get all filmes: ${JSON.stringify(data)}`);
+  const teste = `${data[0].visto?'marcado':''}`;
+  console.log(teste);
   data.map((filme) => {
 
     itemLista.insertAdjacentHTML('beforeend', `
-    <div class="movie-card">
+    <div class="movie-card" id=${filme.id}>
       <img src="${filme.imagem}">
         <h3>${filme.nome}</h3>
           <div class="notaCheck">
             <p>Nota:</p>
               <p class="nota"> ${filme.nota}</p>
                 <label>Já vi!
-                 <input id=${filme.id} type="checkbox" name="visto"/></label>
+                  <input type="checkbox" name="visto" onClick="filmeMarcado(${filme.id})"/>
+                  </label>
                 </div>
                 <div class="btns-genre">
                 <div class="genero">${filme.genero}</div>
@@ -37,6 +40,13 @@ const getFilmes = async () => {
                 
               </div>
     `)
+
+    if(filme.visto){
+      const card = document.getElementById(filme.id);
+      card.classList.add('marcado');
+      card.querySelector('input[type=checkbox]').checked = true;
+    }
+
     console.log(filme)
   });
 }
@@ -82,42 +92,42 @@ const submitForm = async (evento) => {
 
     if (result) {
       getFilmes();
-    } 
-    
-  }else {
+    }
 
-      const request = new Request(`${urlApi}/${idEdit}`, {
-        method: 'PUT',
-        body: JSON.stringify(filmeCard),
-        headers: new Headers({
-          'Content-Type': 'application/json'
-        })
+  } else {
 
-
+    const request = new Request(`${urlApi}/${idEdit}`, {
+      method: 'PUT',
+      body: JSON.stringify(filmeCard),
+      headers: new Headers({
+        'Content-Type': 'application/json'
       })
 
 
-      const response = await fetch(request);
+    })
 
-      const result = await response.json();
 
-      if(result) {
-        getFilmes();
+    const response = await fetch(request);
 
-      }
+    const result = await response.json();
+
+    if (result) {
+      getFilmes();
+
     }
-
-    nome.value = '';
-    genero.value = '';
-    nota.value = '';
-    imagem.value = '';
-
-    itemLista.innerHTML = '';
-
-
-
-    editando = false;
   }
+
+  nome.value = '';
+  genero.value = '';
+  nota.value = '';
+  imagem.value = '';
+
+  itemLista.innerHTML = '';
+
+
+
+  editando = false;
+}
 
 const getFilmeById = async (id) => {
   const response = await fetch(`${urlApi}/${id}`);
@@ -126,13 +136,6 @@ const getFilmeById = async (id) => {
 }
 
 
-// const marcarAssistido = (id) => {
-//   const index = data.findIndex(filme => filme.id === id);
-//   data[index].visto = !data[index].visto;
-//   console.log(data[index]);
-
-//   getFilmeById(data[index]);
-// }
 
 
 
@@ -166,3 +169,30 @@ const deleteFilme = async (id) => {
   itemLista.innerHTML = '';
   getFilmes();
 }
+
+
+const filmeMarcado = async (id)=> {
+  
+  
+  console.log('marcou', id)
+  const card = document.getElementById(id);
+  
+  const checkbox = card.querySelector('input[type=checkbox]');
+  
+  
+  const request = new Request(`${urlApi}/${id}/visto`, 
+    {method: 'PUT', 
+    body: JSON.stringify({visto:checkbox.checked})});
+
+  await fetch(request)
+  console.log(request)
+
+  if(checkbox.checked){
+    card.classList.add('marcado');
+  } else{
+    card.classList.remove('marcado');
+  }
+  // getFilmes();
+
+}
+

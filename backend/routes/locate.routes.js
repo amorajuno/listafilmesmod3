@@ -5,22 +5,14 @@ const router = express.Router();
 
 const listaFilmes = [
     {
-        id: Date.now(),
-        nome: "Juno",
-        genero: "Comédia dramática",
-        nota: "6",
-        imagem: "https://www.nit.pt/wp-content/uploads/2018/05/0af40e405b1477709c1562b828e7435a-754x394.jpg"
-    },
-    {
-        id: Date.now(),
+        id: 1,
         nome: "Mr. Nobody",
         genero: "Drama",
         nota: "8",
-        imagem: "https://ufla.br/dcom/wp-content/uploads/2014/02/Mr-Nobody.jpg"
+        imagem: "https://ufla.br/dcom/wp-content/uploads/2014/02/Mr-Nobody.jpg",
+        visto: false,
     },
 ];
-
-
 
 
 router.get('/', (req, res) => {
@@ -78,8 +70,20 @@ router.delete('/:id', (req, res) => {
         filme.id == id);
     listaFilmes.splice(index, 1);
 
-    res.send({
+    res.status(200).send({
         message: 'voce excluiu esse título',
+    })
+})
+
+router.put('/:id/visto', (req, res)=> {
+    const id = req.params.id;
+    const visto = req.body.visto;
+    console.log(`visto:${visto}`);
+    const index = listaFilmes.findIndex((filme) => filme.id == id);
+    listaFilmes[index].visto = visto;
+    console.log(`filme a atualizar:${JSON.stringify(listaFilmes[id])}`)
+    res.send({
+        message: 'esse filme já tá batido',
     })
 })
 
