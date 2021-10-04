@@ -47,7 +47,7 @@ const getFilmes = async () => {
       card.querySelector('input[type=checkbox]').checked = true;
     }
 
-    console.log(filme)
+    // console.log(filme)
   });
 }
 
